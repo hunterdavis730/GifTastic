@@ -14,11 +14,43 @@
 <body>
     <div class="container">
 
-        <button class="btn btn-outline-dark search" data-letter="Jesus">Click</button>
+        <div class="row">
+
+            <div class="col-md-12" id="gif-buttons">
+
+
+
+            </div>
+
+
+
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+
+                <!-- Gif Search Bar  -->
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="gif-search" placeholder="Search for a GIF">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-danger" type="button" id="search-button">Search</button>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-8">
+
+            </div>
+        </div>
+
 
         <div class="row">
             <div class="col-md-6" id="display-here">
 
+            </div>
+            <div class="col-md-6" id="fav-display">
+                <h1 class="text-center display-4 text-danger float-right d-none" id="fav-head" style="width: 20rem;">Favorite
+                    Gifs</h1>
             </div>
         </div>
     </div>
