@@ -2,6 +2,23 @@ var topics = ['Dog Fails', 'Snowboarding Fails', 'Basketball Fails', 'Drunk Fail
 
 const APIKey = 'api_key=dc6zaTOxFJmzC&limit=10';
 
+var numOfFavorites = localStorage.getItem('numGifs');
+
+var gifKeys = [];
+
+
+var config = {
+    apiKey: "AIzaSyBlejNIPjQHU2gpMUooMC1Lv0XiV6H6SqY",
+    authDomain: "new-project-f1c59.firebaseapp.com",
+    databaseURL: "https://new-project-f1c59.firebaseio.com",
+    projectId: "new-project-f1c59",
+    storageBucket: "new-project-f1c59.appspot.com",
+    messagingSenderId: "118880562717"
+};
+firebase.initializeApp(config);
+
+var database = firebase.database();
+
 
 
 
@@ -50,15 +67,21 @@ function displayGif(response) {
     for (i = 0; i < results.length; i++) {
         var gifCard = $('<div>').addClass('card bg-dark my-3 gifCard')
 
-        var gif = $('<img>').attr('src', results[i].images.fixed_height.url).addClass('card-img-top').css('width', '100%')
+        var gif = $('<img>').attr({
+            'src': results[i].images.original_still.url,
+            'data-state': 'still',
+            'data-still': results[i].images.original_still.url,
+            'data-animate': results[i].images.fixed_height.url
+        }).addClass('card-img-top playGif').css('width', '100%')
 
         var gifBody = $('<div>').addClass('card-body d-flex justify-content-center')
-
-        var favorite = $('<button>').addClass('btn btn-outline-danger favorite').attr('data-letter', results[i].images.fixed_height.url).text('Favorite')
+        var rating = $('<p>').addClass('card-text d-block mt-3 mb-0 text-center text-light').text('Rated: ' + results[i].rating.toUpperCase());
+        var instructions = $('<p>').addClass('card-text d-block mt-1 mb-0 text-center text-light').text('Click above to play the GIF')
+        var favorite = $('<button>').addClass('btn btn-outline-danger mx-2 favorite').attr('data-letter', results[i].images.fixed_height.url).text('Favorite')
 
         gifBody.append(favorite);
 
-        gifCard.prepend(gif)
+        gifCard.prepend(rating).prepend(instructions).prepend(gif)
         gifCard.append(gifBody)
 
 
@@ -79,9 +102,28 @@ function favoriteCard(event) {
 
 
 
+
+
     $('#fav-display').append(gifCard)
 }
 
+// function loadFavorites() {
+//     database.ref('/favorites').on('value', function (snapshot) {
+//         console.log(snapshot.val())
+//         for (i = 0; i < gifKeys.length; i++) {
+//             if (snapshot.val()) {
+//                 var result = snapshot.val().gifKeys[i].gifUrl
+//                 console.log(result)
+//                 $('#fav-head').removeClass('d-none');
+//                 favoriteCard(result)
+
+
+//             }
+
+//         }
+
+//     });
+// }
 
 
 
@@ -89,6 +131,30 @@ function favoriteCard(event) {
 $(document).ready(function () {
 
     addButton();
+
+    console.log(numOfFavorites)
+    // if (numOfFavorites > 0) {
+    //     gifKeys = localStorage.getItem('key').toString().split(',');
+
+
+    // }
+    // console.log(gifKeys)
+    database.ref('/favorites').on('value', function (snapshot) {
+        console.log(snapshot.val())
+        for (i = 0; i < gifKeys.length; i++) {
+            if (snapshot.val()) {
+                var result = snapshot.val().gifKeys[i].gifUrl
+                console.log(result)
+                $('#fav-head').removeClass('d-none');
+                favoriteCard(result)
+
+
+            }
+
+        }
+
+    });
+
 
 
 
@@ -117,12 +183,46 @@ $(document).ready(function () {
     $(document).on('click', '.favorite', function () {
         $('#fav-head').removeClass('d-none')
         var favGif = $(this).attr('data-letter')
+        numOfFavorites++;
+        console.log(favGif)
+
 
         var event = $(this).parent();
         event.parent().empty();
 
         favoriteCard(favGif)
 
+        var newGif = database.ref('/favorites').push({
+            gifUrl: favGif
+        })
+
+        gifKeys.push(newGif.key);
+
+        console.log(gifKeys)
+
+        localStorage.clear();
+
+        localStorage.setItem('key', gifKeys)
+
+        localStorage.setItem('numGifs', numOfFavorites)
+
+
+    })
+
+    $(document).on('click', '.playGif', function () {
+        var state = $(this).attr('data-state');
+
+
+        if (state === 'still') {
+            $(this).attr('src', $(this).attr('data-animate'))
+            $(this).attr('data-state', 'animate')
+
+        }
+
+        if (state === 'animate') {
+            $(this).attr('src', $(this).attr('data-still'))
+            $(this).attr('data-state', 'still')
+        }
     })
 
 
