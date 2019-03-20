@@ -104,26 +104,10 @@ function favoriteCard(event) {
 
 
 
-    $('#fav-display').append(gifCard)
+    $('#fav-display').append(gifCard).fadeIn('slow');
 }
 
-// function loadFavorites() {
-//     database.ref('/favorites').on('value', function (snapshot) {
-//         console.log(snapshot.val())
-//         for (i = 0; i < gifKeys.length; i++) {
-//             if (snapshot.val()) {
-//                 var result = snapshot.val().gifKeys[i].gifUrl
-//                 console.log(result)
-//                 $('#fav-head').removeClass('d-none');
-//                 favoriteCard(result)
 
-
-//             }
-
-//         }
-
-//     });
-// }
 
 
 
@@ -133,23 +117,28 @@ $(document).ready(function () {
     addButton();
 
     console.log(numOfFavorites)
-    // if (numOfFavorites > 0) {
-    //     gifKeys = localStorage.getItem('key').toString().split(',');
 
+    if (numOfFavorites > 0) {
+        gifKeys = localStorage.getItem('key').split(',')
 
-    // }
-    // console.log(gifKeys)
+    }
+
+    console.log(gifKeys)
     database.ref('/favorites').on('value', function (snapshot) {
         console.log(snapshot.val())
-        for (i = 0; i < gifKeys.length; i++) {
-            if (snapshot.val()) {
-                var result = snapshot.val().gifKeys[i].gifUrl
-                console.log(result)
-                $('#fav-head').removeClass('d-none');
-                favoriteCard(result)
+        var arr = snapshot.val().gifUrl
+        $('#fav-head').removeClass('d-none');
+        $('#fav-display').empty();
+
+        for (var i = 0; i < arr.length; i++) {
+
+            var result = arr[i];
+            console.log(result)
+
+            favoriteCard(result)
 
 
-            }
+
 
         }
 
@@ -184,27 +173,38 @@ $(document).ready(function () {
         $('#fav-head').removeClass('d-none')
         var favGif = $(this).attr('data-letter')
         numOfFavorites++;
-        console.log(favGif)
+        // console.log(favGif)
 
 
         var event = $(this).parent();
-        event.parent().empty();
+        console.log(event)
+        event.parent().remove();
 
-        favoriteCard(favGif)
+        // favoriteCard(favGif)
 
-        var newGif = database.ref('/favorites').push({
-            gifUrl: favGif
-        })
-
-        gifKeys.push(newGif.key);
+        gifKeys.push(favGif)
 
         console.log(gifKeys)
 
-        localStorage.clear();
+
+
+
+
+
+        var newGif = database.ref('/favorites').set({
+            gifUrl: gifKeys
+        })
+
+
+
+
+
 
         localStorage.setItem('key', gifKeys)
 
         localStorage.setItem('numGifs', numOfFavorites)
+
+        // localStorage.getItem('key')
 
 
     })
